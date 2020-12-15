@@ -1,0 +1,33 @@
+#!/bin/bash
+wget 127.0.0.1:8080/cert
+mv cert cacert.der
+openssl x509 -inform DER -in cacert.der -out cacert.pem
+c=$(openssl x509 -inform PEM -subject_hash_old -in cacert.pem | head -1)
+mv cacert.pem $c.0
+
+#method mount 1
+adb remount
+adb shell 'su root -c mount -o rw,remount /system'
+adb push $c.0 /data/local/tmp/
+adb shell "chmod 644 /data/local/tmp/$c.0 && su root -c mv /data/local/tmp/$c.0 /system/etc/security/cacerts/"
+check='if [ -f "/system/etc/security/cacerts/'$c'.0" ]; then echo lol;fi'
+check2=$(adb shell $check)
+
+if [ "$check2" = "lol" ]; then
+	echo "certificate successfully installed"
+else
+	#method mount 2
+	echo "certificate failed to install with method-1, trying method-2 ... "
+	d=$(adb shell "cat /proc/mounts | grep system | grep -v magisk" | awk '{print $3}')
+	e=$(adb shell "cat /proc/mounts | grep system | grep -v magisk" | awk '{print $2}')
+	f=$(adb shell "cat /proc/mounts | grep system | grep -v magisk" | awk '{print $1}')
+	adb shell su root -c mount -o rw,remount -t $d $f $e
+	adb push $c.0 /data/local/tmp/
+	adb shell "chmod 644 /data/local/tmp/$c.0 && su root -c mv /data/local/tmp/$c.0 /system/etc/security/cacerts/"
+	
+	if [ "$check2" = "lol" ]; then
+		echo "certificate successfully installed"
+	else
+		echo "certificate failed to install"
+	fi	
+fi
