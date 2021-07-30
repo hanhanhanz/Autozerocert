@@ -28,6 +28,22 @@ else
 	if [ "$check2" = "lol" ]; then
 		echo "certificate successfully installed"
 	else
-		echo "certificate failed to install"
+		#method mount 3
+		echo "certificate failed to install with method-2, trying method-3 ... "
+		adb shell 'mkdir /sdcard/tesdodol'
+		adb push $c.0 /sdcard/tesdodol/$c.0
+		adb shell "su root cp /system/etc/security/cacerts/* /sdcard/tesdodol/"
+		adb shell "su root mount -t tmpfs tmpfs /system/etc/security/cacerts"
+		adb shell "su root mv /sdcard/tesdodol/* /system/etc/security/cacerts/"
+		adb shell "su root chown root:root /system/etc/security/cacerts/*"
+		adb shell "su root chmod 644 /system/etc/security/cacerts/*"
+		adb shell "su root chcon u:object_r:system_file:s0 /system/etc/security/cacerts/*"
+		adb shell "su root rm -r /sdcard/tesdodol/"
+		if [ "$check2" = "lol" ]; then
+			echo "certificate successfully installed"
+		else
+			echo "certificate failed to installed"
+		fi
+
 	fi	
 fi
