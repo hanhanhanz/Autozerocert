@@ -1,6 +1,6 @@
 # Autozerocert
 
-script for automate installation of system-level burp certificate in android root device. also work with android device which unable to "adb root". burp certificate obtain from 127.0.0.1:8080
+script for automate installation of system-level burp certificate in android root device. also work with android device which unable to "adb root". burp certificate obtain from 127.0.0.1:8080. Check in setting at "View security certificates" for Portswigger cert to validate the installation
 
 
 ### Requirement
