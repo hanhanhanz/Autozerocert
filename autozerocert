@@ -24,7 +24,8 @@ else
 	adb shell su root -c mount -o rw,remount -t $d $f $e
 	adb push $c.0 /data/local/tmp/
 	adb shell "chmod 644 /data/local/tmp/$c.0 && su root -c mv /data/local/tmp/$c.0 /system/etc/security/cacerts/"
-	
+	check='if [ -f "/system/etc/security/cacerts/'$c'.0" ]; then echo lol;fi'
+	check2=$(adb shell $check)
 	if [ "$check2" = "lol" ]; then
 		echo "certificate successfully installed"
 	else
@@ -39,6 +40,8 @@ else
 		adb shell "su root chmod 644 /system/etc/security/cacerts/*"
 		adb shell "su root chcon u:object_r:system_file:s0 /system/etc/security/cacerts/*"
 		adb shell "su root rm -r /sdcard/tesdodol/"
+		check='if [ -f "/system/etc/security/cacerts/'$c'.0" ]; then echo lol;fi'
+		check2=$(adb shell $check)
 		if [ "$check2" = "lol" ]; then
 			echo "certificate successfully installed"
 		else
